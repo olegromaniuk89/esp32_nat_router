@@ -1,0 +1,27 @@
+name: Build firmware
+on:
+  workflow_dispatch:      # запуск вручну кнопкою
+  push:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive      # WireGuard підключений як submodule
+      - name: Build with ESP-IDF
+        uses: espressif/esp-idf-ci-action@v1
+        with:
+          esp_idf_version: v5.5      # постав версію, з якою збирається проєкт
+          target: esp32              # твій чип
+          path: .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: firmware
+          path: |
+            build/esp32_nat_router.bin
+            build/bootloader/bootloader.bin
+            build/partition_table/partition-table.bin
+            build/ota_data_initial.bin

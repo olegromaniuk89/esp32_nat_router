@@ -12,6 +12,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "lwip/ip_addr.h"
+#include "lwip/lwip_napt.h"
 #include "vpn_config.h"
 #include "router_config.h"
 #include "portmap.h"
@@ -103,6 +104,7 @@ esp_err_t vpn_connect(void)
     /* Cache VPN tunnel IP and activate VPN-bound port mappings */
     if (wg_ctx.netif) {
         vpn_tunnel_ip = ip_2_ip4(&wg_ctx.netif->ip_addr)->addr;
+        ip_napt_enable(vpn_tunnel_ip, 1);
     }
     delete_portmap_tab();
     apply_portmap_tab();
@@ -136,6 +138,7 @@ void vpn_disconnect(void)
     // Set vpn_connected false FIRST to prevent race with vpn_is_connected()
     // (called from netif hooks and HTTP handlers in other tasks)
     vpn_connected = false;
+    if (vpn_tunnel_ip) ip_napt_enable(vpn_tunnel_ip, 0);
     vpn_tunnel_ip = 0;
     ap_mss_clamp = 0;
     ap_pmtu = 0;

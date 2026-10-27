@@ -21,7 +21,7 @@ jobs:
         with:
           name: firmware
           path: |
-            firmware_esp32/esp32_nat_router.bin
-            firmware_esp32/bootloader.bin
-            firmware_esp32/partition-table.bin
-            firmware_esp32/ota_data_initial.bin
+            build/esp32_nat_router.bin
+            build/bootloader/bootloader.bin
+            build/partition_table/partition-table.bin
+            build/ota_data_initial.bin

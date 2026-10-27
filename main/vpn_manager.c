@@ -16,6 +16,8 @@
 #include "vpn_config.h"
 #include "router_config.h"
 #include "portmap.h"
+#include "lwip/netif.h"
+extern void init_wg_netif_hooks(struct netif *wg);
 
 static const char *TAG = "vpn_mgr";
 
@@ -96,6 +98,7 @@ esp_err_t vpn_connect(void)
      * PMTU/MSS cover DF and TCP traffic from AP clients. */
     if (wg_ctx.netif) {
         wg_ctx.netif->mtu = (u16_t)vpn_mtu;
+        init_wg_netif_hooks(wg_ctx.netif);         
     }
     ap_mss_clamp = (uint16_t)(vpn_mtu - 40);
     ap_pmtu = (uint16_t)vpn_mtu;

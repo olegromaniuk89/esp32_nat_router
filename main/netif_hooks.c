@@ -40,6 +40,7 @@ static const char *TAG = "netif_hooks";
 static netif_input_fn original_netif_input = NULL;
 static netif_linkoutput_fn original_netif_linkoutput = NULL;
 static struct netif *sta_netif = NULL;
+static void clamp_tcp_mss(struct pbuf *p, uint16_t max_mss);
 
 // Original AP netif function pointers
 static netif_input_fn original_ap_netif_input = NULL;
@@ -159,7 +160,7 @@ static IRAM_ATTR err_t netif_input_hook(struct pbuf *p, struct netif *netif) {
     if (pcap_should_capture(is_acl_monitored, false)) {
         pcap_capture_packet(p);
     }
-
+    clamp_tcp_mss(p, ap_mss_clamp);
     // Count received bytes and toggle LED
     if (netif == sta_netif && p != NULL) {
         sta_bytes_received += p->tot_len;
@@ -236,7 +237,7 @@ static IRAM_ATTR err_t netif_linkoutput_hook(struct netif *netif, struct pbuf *p
     if (pcap_should_capture(is_acl_monitored, false)) {
         pcap_capture_packet(p);
     }
-
+    clamp_tcp_mss(p, ap_mss_clamp);
     // Count sent bytes and toggle LED
     if (netif == sta_netif && p != NULL) {
         sta_bytes_sent += p->tot_len;

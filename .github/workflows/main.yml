@@ -1,8 +1,6 @@
 name: Build firmware
 on:
   workflow_dispatch:      # запуск вручну кнопкою
-  push:
-    branches: [master]
 
 jobs:
   build:
